@@ -2,11 +2,12 @@ import numpy as np
 from copy import deepcopy
 import networkx as nx
 import scipy as sp
-from depq import DEPQ
-
 rng = np.random.RandomState()
-#seeded_rng = np.random.RandomState(17310145)
 seeded_rng = rng
+
+'''
+Functions for producing generative model graphs
+'''
 def get_random_modular(n, modules, edges, p, getCommInfo=False):
     pairings = {}
     assignments = np.zeros(n, dtype = int)
@@ -18,17 +19,6 @@ def get_random_modular(n, modules, edges, p, getCommInfo=False):
         randomModule = seeded_rng.randint(0, modules)
         pairings[randomModule].append(i)
         assignments[i] = randomModule
-    # nodesPerMod = n // modules
-    # for i in range(modules):
-    #     for j in range(nodesPerMod):
-    #         pairings[i].append(nodesPerMod * i + j)
-    #         assignments[nodesPerMod *i + j] = i
-    # for i in range(modules - 1):
-    #     if len(pairings[i]) < 3 or len(pairings[i+1]) < 3:
-    #         return None, None
-    #     e0, e1 = seeded_rng.choice(pairings[i], 1), seeded_rng.choice(pairings[i+1], 1)
-    #     A[e0, e1], A[e1, e0] = 1, 1
-    #     cross_module_edges.append((e0, e1))
     def add_modular_edge():
         randomComm = seeded_rng.randint(0, modules)
         while len(pairings[randomComm]) < 2:
@@ -193,7 +183,7 @@ def create_modular_toy(edges, modular_edges):
         add_cross_edge()
     return adjMatrix
 
-def modular_toy_paper(): ##constructs the three-community network, often used in studying human information processing
+def modular_graph_exemplar():
     result = np.zeros((15, 15))
     for i in range(5):
         for j in range(5):
@@ -218,7 +208,7 @@ def modular_toy_paper(): ##constructs the three-community network, often used in
     return result
 
 def biased_modular(cross_cluster_bias, boundary_bias):
-    result = modular_toy_paper()
+    result = modular_graph_exemplar()
     result[0][14], result[14][0] = cross_cluster_bias, cross_cluster_bias
     result[4][5], result[5][4] = cross_cluster_bias, cross_cluster_bias
     result[9][10], result[10][9] = cross_cluster_bias, cross_cluster_bias
@@ -367,7 +357,7 @@ def optimize(A, beta, iterations, scoreFunc, flipFunc, minimize = True, A_target
     return bestVal,  best
 
 
-def modular_toys_general(N_tot, N_comms, cc_bias, b_bias):
+def modular_exemplar_general(N_tot, N_comms, cc_bias, b_bias):
     A = np.zeros((N_tot, N_tot))
     N_in = N_tot // N_comms
     b = [] #boundary nodes
